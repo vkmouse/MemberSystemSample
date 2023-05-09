@@ -1,0 +1,47 @@
+﻿
+@{
+    ViewBag.Title = "Member";
+}
+
+<main>
+    <div class="text-center w-100 p-4 bg-primary">
+        <span class="h2 text-light">歡迎光臨，這是會員頁</span>
+    </div>
+    <div id="main" class="row p-4">
+        <div class="col-12 text-center p-1">恭喜您，登入成功</div>
+        <div class="col-12 text-center p-1">
+            <a href="/" v-on:click="logout">登出頁面</a>
+        </div>
+    </div>
+    <script src="../Scripts/vue.js"></script>
+    <script>
+        fetch("/Home/UserInfo")
+            .then(resp => resp.json())
+            .then(userInfo => {
+                if (!userInfo.success) {
+                    window.location.href = "/"
+                }
+            })
+
+        new Vue({
+            el: "#main",
+            methods: {
+                logout: async function () {
+                    try {
+                        const response = await fetch("/Home/Logout", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            }
+                        });
+                        const data = await response.json();
+                        console.log(data);
+                    } catch (error) {
+                        console.error(error);
+                        alert("An error occurred while submitting the form.");
+                    }
+                }
+            }
+        });
+    </script>
+</main>

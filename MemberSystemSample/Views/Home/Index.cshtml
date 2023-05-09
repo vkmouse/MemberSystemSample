@@ -1,0 +1,75 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<main>
+    <div class="text-center w-100 p-4 bg-primary">
+        <span class="h2 text-light">歡迎光臨，請輸入帳號密碼</span>
+    </div>
+    <form id="main" class="row p-4">
+        <div class="col-12 text-center p-1">登入系統</div>
+        <div class="col-12 d-flex justify-content-center p-1">
+            <span>帳號</span>
+            <input type="text" v-model="username" name="username" />
+        </div>
+        <div class="col-12 d-flex justify-content-center p-1">
+            <span>密碼</span>
+            <input type="text" v-model="password" name="password" />
+        </div>
+        <div class="col-12 d-flex justify-content-center p-1">
+            <button type="button" v-on:click="login">登入</button>
+        </div>
+        <span>{{ fullName }}</span>
+    </form>
+
+    <script src="../Scripts/vue.js"></script>
+    <script>
+        fetch("/Home/UserInfo")
+            .then(resp => resp.json())
+            .then(userInfo => {
+                if (userInfo.success) {
+                    window.location.href = "/Home/Member"
+                }
+            })
+
+        new Vue({
+            el: "#main",
+            data: {
+                username: "",
+                password: ""
+            },
+            computed: {
+                fullName: function () {
+                    return this.username + " " + this.password;
+                }
+            },
+            methods: {
+                login: async function () {
+                    const requestData = {
+                        username: this.username,
+                        password: this.password
+                    };
+
+                    try {
+                        const response = await fetch("/Home/Login", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(requestData)
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            window.location.href = "/Home/Member";
+                        } else {
+                            window.location.href = "/Home/Error?message=" + data.message;
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        alert("An error occurred while submitting the form.");
+                    }
+                }
+            }
+        });
+    </script>
+</main>
